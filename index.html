@@ -264,9 +264,13 @@
 
   <div class="quick-replies" id="quickReplies">
     <button class="quick-btn" onclick="sendQuick('O que voce faz?')">O que voce faz?</button>
-    <button class="quick-btn" onclick="sendQuick('Me conte uma curiosidade')">Curiosidade</button>
-    <button class="quick-btn" onclick="sendQuick('Qual seu nome?')">Seu nome?</button>
     <button class="quick-btn" onclick="sendQuick('Me ajuda com programacao')">Programacao</button>
+    <button class="quick-btn" onclick="sendQuick('Fala sobre tecnologia')">Tecnologia</button>
+    <button class="quick-btn" onclick="sendQuick('O que e cloud computing?')">Cloud</button>
+    <button class="quick-btn" onclick="sendQuick('Fala sobre ciberseguranca')">Seguranca</button>
+    <button class="quick-btn" onclick="sendQuick('Como criar apps mobile?')">Mobile</button>
+    <button class="quick-btn" onclick="sendQuick('Dicas de carreira em TI')">Carreira</button>
+    <button class="quick-btn" onclick="sendQuick('Me conte uma curiosidade')">Curiosidade</button>
   </div>
 
   <div class="chat-input">
@@ -309,11 +313,69 @@ const botKnowledge = {
     ]
   },
   technology: {
-    patterns: ['tecnologia', 'ia', 'inteligencia artificial', 'machine learning', 'chatgpt', 'futuro', 'computador'],
+    patterns: ['tecnologia', 'ia', 'inteligencia artificial', 'machine learning', 'chatgpt', 'futuro', 'computador', 'tech'],
     responses: [
       'A Inteligencia Artificial esta revolucionando o mundo! Desde assistentes virtuais ate carros autonomos, a IA esta em toda parte. Estudar IA hoje e investir no futuro!',
       'A tecnologia evolui rapidamente. Em 2026, temos IA generativa, computacao quantica avancando, e a web cada vez mais imersiva. E um otimo momento para entrar na area de TI!',
-      'Machine Learning e um ramo da IA onde o computador aprende com dados. E usado em recomendacoes do Netflix, traducoes automaticas, e muito mais!'
+      'Machine Learning e um ramo da IA onde o computador aprende com dados. E usado em recomendacoes do Netflix, traducoes automaticas, e muito mais!',
+      'O ChatGPT e o Claude sao exemplos de IA generativa. Eles usam redes neurais treinadas com bilhoes de textos para gerar respostas. O futuro da programacao passa por saber usar essas ferramentas!',
+      'Deep Learning e uma tecnica avancada de IA que imita o cerebro humano com redes neurais profundas. E o que permite reconhecimento facial, traducao em tempo real e carros autonomos!'
+    ]
+  },
+  cloud: {
+    patterns: ['cloud', 'nuvem', 'aws', 'azure', 'servidor', 'hospedagem', 'deploy', 'devops'],
+    responses: [
+      'Cloud Computing e usar servidores remotos pela internet em vez de ter tudo no seu computador. Os 3 maiores provedores sao: AWS (Amazon), Azure (Microsoft) e GCP (Google).',
+      'DevOps e a pratica de unir desenvolvimento e operacoes. Ferramentas como Docker, Kubernetes e CI/CD automatizam o deploy e garantem que o software roda sem problemas!',
+      'AWS (Amazon Web Services) e a plataforma de nuvem mais usada no mundo. Com ela voce hospeda sites, bancos de dados, e ate treina modelos de IA. Muitas vagas pedem conhecimento em cloud!'
+    ]
+  },
+  security: {
+    patterns: ['seguranca', 'ciberseguranca', 'hacker', 'virus', 'protecao', 'senha', 'privacidade', 'lgpd'],
+    responses: [
+      'Ciberseguranca e uma das areas que mais cresce em TI! Profissionais de seguranca protegem sistemas contra hackers, vazamentos de dados e ataques. E uma carreira com salarios altos e muita demanda.',
+      'Dicas de seguranca digital: 1) Use senhas fortes e diferentes para cada site, 2) Ative autenticacao de 2 fatores, 3) Nunca clique em links suspeitos, 4) Mantenha seus softwares atualizados.',
+      'A LGPD (Lei Geral de Protecao de Dados) e a lei brasileira que protege dados pessoais. Empresas precisam de profissionais que entendam de privacidade e conformidade legal!'
+    ]
+  },
+  blockchain: {
+    patterns: ['blockchain', 'bitcoin', 'cripto', 'criptomoeda', 'ethereum', 'web3', 'nft'],
+    responses: [
+      'Blockchain e uma tecnologia que registra transacoes de forma descentralizada e segura. E a base do Bitcoin e outras criptomoedas, mas tambem e usado em contratos inteligentes e logistica!',
+      'Web3 e a nova geracao da internet baseada em blockchain. A ideia e que os usuarios tenham mais controle sobre seus dados e ativos digitais, sem depender de grandes empresas.',
+      'Ethereum e mais que uma criptomoeda - e uma plataforma para criar aplicacoes descentralizadas (dApps) usando contratos inteligentes escritos em Solidity!'
+    ]
+  },
+  iot: {
+    patterns: ['iot', 'internet das coisas', 'smart home', 'casa inteligente', 'sensor', 'arduino', 'raspberry'],
+    responses: [
+      'IoT (Internet das Coisas) conecta objetos do dia a dia a internet. Geladeira, relogio, lampada - tudo pode ser "inteligente"! E uma area que mistura hardware e software.',
+      'Arduino e Raspberry Pi sao placas usadas para criar projetos de IoT. Com elas voce pode fazer desde sensores de temperatura ate sistemas de automacao residencial. Otimo para aprender eletronica e programacao!',
+      'Casas inteligentes usam IoT para automatizar luzes, seguranca, temperatura e muito mais. Assistentes como Alexa e Google Home sao o centro dessas solucoes!'
+    ]
+  },
+  database: {
+    patterns: ['banco de dados', 'database', 'sql', 'mysql', 'mongodb', 'postgres', 'dados'],
+    responses: [
+      'Bancos de dados armazenam informacoes de forma organizada. Existem dois tipos principais: SQL (tabelas, como MySQL e PostgreSQL) e NoSQL (flexiveis, como MongoDB). Saber SQL e essencial para qualquer programador!',
+      'SQL e a linguagem para manipular bancos de dados. Com ela voce cria tabelas, insere dados, faz buscas e muito mais. E uma das habilidades mais pedidas em vagas de TI!',
+      'MongoDB e um banco NoSQL que guarda dados em formato JSON. E muito usado em apps modernos e combina super bem com Node.js!'
+    ]
+  },
+  career: {
+    patterns: ['carreira', 'emprego', 'vaga', 'salario', 'mercado', 'trabalho', 'estagio', 'junior'],
+    responses: [
+      'O mercado de TI esta aquecido! Areas com mais vagas: Desenvolvimento Web, Ciencia de Dados, Ciberseguranca e Cloud. Para comecar, invista em um portfolio no GitHub e projetos praticos!',
+      'Para conseguir um estagio em TI: 1) Tenha projetos no GitHub, 2) Aprenda Git e versionamento, 3) Faca cursos e certificacoes, 4) Participe de comunidades e eventos. Networking e tudo!',
+      'Dica de carreira: Nao espere saber tudo para se candidatar! Empresas buscam pessoas que aprendem rapido e tem dedicacao. Seu portfolio e mais importante que diplomas!'
+    ]
+  },
+  mobile: {
+    patterns: ['mobile', 'app', 'celular', 'android', 'ios', 'flutter', 'react native', 'aplicativo'],
+    responses: [
+      'Para criar apps mobile voce pode usar: React Native (JavaScript), Flutter (Dart) ou desenvolvimento nativo (Swift para iOS, Kotlin para Android). React Native e otimo para quem ja sabe JavaScript!',
+      'Flutter e o framework do Google para criar apps bonitos para Android e iOS com um unico codigo. Usa a linguagem Dart e tem crescido muito no mercado!',
+      'Apps mobile sao uma otima forma de mostrar habilidades no portfolio! Comece com algo simples como um app de lista de tarefas ou calculadora.'
     ]
   },
   curiosity: {
