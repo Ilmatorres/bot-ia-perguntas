@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bot IA - Assistente Virtual</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 500px;
+      height: 90vh;
+      max-height: 700px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    /* Header */
+    .chat-header {
+      padding: 20px 24px;
+      background: rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .bot-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #7c5cfc, #00d4aa);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .bot-info h2 {
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .bot-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: #00d4aa;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: #00d4aa;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Messages */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-track { background: transparent; }
+    .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+    .message {
+      max-width: 82%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      animation: msgIn 0.3s ease;
+      word-wrap: break-word;
+    }
+
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .message.bot {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.08);
+      color: #e0e0e0;
+      border-bottom-left-radius: 6px;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #7c5cfc, #5a3fd4);
+      color: #fff;
+      border-bottom-right-radius: 6px;
+    }
+
+    .message.bot .msg-time,
+    .message.user .msg-time {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.35);
+      margin-top: 6px;
+      display: block;
+    }
+
+    /* Typing indicator */
+    .typing {
+      align-self: flex-start;
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 18px;
+      border-bottom-left-radius: 6px;
+      display: none;
+    }
+
+    .typing.show { display: flex; gap: 5px; align-items: center; }
+
+    .typing span {
+      width: 7px;
+      height: 7px;
+      background: rgba(255,255,255,0.4);
+      border-radius: 50%;
+      animation: typingDot 1.4s infinite;
+    }
+
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingDot {
+      0%, 100% { opacity: 0.3; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-4px); }
+    }
+
+    /* Quick Replies */
+    .quick-replies {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 0 20px 10px;
+    }
+
+    .quick-btn {
+      padding: 8px 16px;
+      border: 1px solid rgba(124,92,252,0.4);
+      border-radius: 20px;
+      background: rgba(124,92,252,0.1);
+      color: #b8a4ff;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .quick-btn:hover {
+      background: #7c5cfc;
+      color: #fff;
+      border-color: #7c5cfc;
+    }
+
+    /* Input */
+    .chat-input {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      gap: 10px;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 12px 18px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .chat-input input::placeholder { color: rgba(255,255,255,0.3); }
+    .chat-input input:focus { border-color: #7c5cfc; }
+
+    .btn-send {
+      width: 46px;
+      height: 46px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #7c5cfc, #5a3fd4);
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-send:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(124,92,252,0.4);
+    }
+
+    @media (max-width: 500px) {
+      .chat-container {
+        height: 100vh;
+        max-height: none;
+        border-radius: 0;
+      }
+      body { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">
+    <div class="bot-avatar">&#129302;</div>
+    <div class="bot-info">
+      <h2>Torres Bot IA</h2>
+      <div class="bot-status">
+        <div class="status-dot"></div>
+        Online agora
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-messages" id="chatMessages">
+    <!-- Messages appear here -->
+  </div>
+
+  <div class="typing" id="typing">
+    <span></span><span></span><span></span>
+  </div>
+
+  <div class="quick-replies" id="quickReplies">
+    <button class="quick-btn" onclick="sendQuick('O que voce faz?')">O que voce faz?</button>
+    <button class="quick-btn" onclick="sendQuick('Me conte uma curiosidade')">Curiosidade</button>
+    <button class="quick-btn" onclick="sendQuick('Qual seu nome?')">Seu nome?</button>
+    <button class="quick-btn" onclick="sendQuick('Me ajuda com programacao')">Programacao</button>
+  </div>
+
+  <div class="chat-input">
+    <input type="text" id="msgInput" placeholder="Digite sua mensagem..." onkeypress="if(event.key==='Enter')sendMessage()">
+    <button class="btn-send" onclick="sendMessage()">&#10148;</button>
+  </div>
+</div>
+
+<script>
+// Knowledge base do bot
+const botKnowledge = {
+  greetings: {
+    patterns: ['ola', 'oi', 'hey', 'bom dia', 'boa tarde', 'boa noite', 'eai', 'e ai', 'fala', 'salve', 'hello', 'hi'],
+    responses: [
+      'Ola! Sou o Torres Bot IA. Como posso te ajudar hoje?',
+      'Oi! Que bom te ver por aqui! Em que posso ajudar?',
+      'Hey! Estou pronto para responder suas perguntas!'
+    ]
+  },
+  name: {
+    patterns: ['seu nome', 'quem e voce', 'como se chama', 'qual seu nome', 'quem voce e'],
+    responses: [
+      'Meu nome e Torres Bot IA! Fui criado para responder perguntas e ajudar com informacoes.',
+      'Sou o Torres Bot, um assistente virtual inteligente criado com JavaScript!'
+    ]
+  },
+  whatdoyoudo: {
+    patterns: ['o que voce faz', 'o que sabe fazer', 'suas funcoes', 'para que serve', 'como funciona'],
+    responses: [
+      'Eu sou um chatbot inteligente! Posso responder perguntas sobre programacao, tecnologia, curiosidades, e muito mais. Experimente me perguntar algo!',
+      'Sou um assistente virtual que responde perguntas. Sei sobre programacao, tecnologia, curiosidades e posso ate contar piadas!'
+    ]
+  },
+  programming: {
+    patterns: ['programacao', 'programar', 'codigo', 'linguagem', 'python', 'javascript', 'java', 'html', 'css', 'react', 'node'],
+    responses: [
+      'Programacao e a arte de dar instrucoes ao computador! As linguagens mais populares hoje sao: Python (IA e dados), JavaScript (web), Java (apps corporativos), e C# (jogos). Qual te interessa?',
+      'Para comecar a programar, recomendo: 1) HTML/CSS para entender a web, 2) JavaScript para interatividade, 3) Python para logica e IA. Quer saber mais sobre alguma?',
+      'JavaScript e a linguagem da web! Com ela voce cria sites interativos, apps com React, e ate servidores com Node.js. Este bot foi feito com JavaScript!'
+    ]
+  },
+  technology: {
+    patterns: ['tecnologia', 'ia', 'inteligencia artificial', 'machine learning', 'chatgpt', 'futuro', 'computador'],
+    responses: [
+      'A Inteligencia Artificial esta revolucionando o mundo! Desde assistentes virtuais ate carros autonomos, a IA esta em toda parte. Estudar IA hoje e investir no futuro!',
+      'A tecnologia evolui rapidamente. Em 2026, temos IA generativa, computacao quantica avancando, e a web cada vez mais imersiva. E um otimo momento para entrar na area de TI!',
+      'Machine Learning e um ramo da IA onde o computador aprende com dados. E usado em recomendacoes do Netflix, traducoes automaticas, e muito mais!'
+    ]
+  },
+  curiosity: {
+    patterns: ['curiosidade', 'fato', 'sabia que', 'conte algo', 'algo interessante', 'fato curioso'],
+    responses: [
+      'Voce sabia que o primeiro bug de computador foi literalmente um inseto? Em 1947, Grace Hopper encontrou uma mariposa presa no computador Harvard Mark II!',
+      'Curiosidade: O Google processa mais de 8.5 bilhoes de pesquisas por dia! Isso e mais de 99 mil pesquisas por segundo.',
+      'Fato curioso: A primeira mensagem enviada pela internet foi "LO". Deveria ser "LOGIN", mas o sistema travou depois das duas primeiras letras, em 1969!',
+      'Voce sabia que existem mais de 700 linguagens de programacao? Mas apenas umas 20 sao amplamente usadas no mercado.',
+      'Curiosidade tech: O primeiro site da historia ainda esta no ar! Foi criado por Tim Berners-Lee em 1991 no CERN.'
+    ]
+  },
+  joke: {
+    patterns: ['piada', 'humor', 'engracado', 'rir', 'conta uma piada', 'me faz rir'],
+    responses: [
+      'Por que o programador usa oculos? Porque ele nao consegue C# (C sharp / ver bem)! &#128514;',
+      'Qual e o cafe preferido do programador? O Java! &#9749;',
+      'O que o JavaScript disse pro Java? Voce nao e meu tipo! &#128516;',
+      'Por que o computador foi ao medico? Porque pegou um virus! &#129298;',
+      'Como o programador termina o namoro? "Nao e voce, e o meu codigo que tem um bug." &#128517;'
+    ]
+  },
+  thanks: {
+    patterns: ['obrigado', 'obrigada', 'valeu', 'agradeco', 'thanks', 'brigado', 'brigada'],
+    responses: [
+      'De nada! Estou sempre aqui para ajudar. Tem mais alguma pergunta?',
+      'Por nada! Foi um prazer ajudar! Precisa de mais alguma coisa?',
+      'Disponha! Se tiver mais duvidas, e so perguntar!'
+    ]
+  },
+  bye: {
+    patterns: ['tchau', 'bye', 'ate mais', 'ate logo', 'falou', 'flw', 'adeus'],
+    responses: [
+      'Tchau! Foi otimo conversar com voce! Volte sempre! &#128075;',
+      'Ate mais! Espero ter ajudado. Volte quando quiser! &#128522;',
+      'Adeus! Boa sorte nos estudos e projetos! &#127775;'
+    ]
+  },
+  help: {
+    patterns: ['ajuda', 'help', 'nao sei', 'me ajuda', 'como usar'],
+    responses: [
+      'Posso te ajudar com varios assuntos! Tente perguntar sobre:\n\n&#128187; Programacao e linguagens\n&#129302; Tecnologia e IA\n&#128161; Curiosidades tech\n&#128514; Piadas de programador\n\nOu simplesmente faca qualquer pergunta!'
+    ]
+  },
+  weather: {
+    patterns: ['tempo', 'clima', 'chuva', 'sol', 'temperatura', 'previsao'],
+    responses: [
+      'Infelizmente nao tenho acesso a dados meteorologicos em tempo real. Mas posso te dizer que um bom programador programa com sol ou chuva! &#9728;&#127783;',
+      'Nao consigo ver o clima, mas posso garantir que o tempo para aprender programacao e AGORA! &#128170;'
+    ]
+  },
+  age: {
+    patterns: ['quantos anos', 'sua idade', 'quando nasceu', 'idade'],
+    responses: [
+      'Sou um bot, entao nao tenho idade! Mas fui criado em 2026, entao tecnicamente sou bem novinho. &#128118;',
+      'Idade? Eu rodo a 60 frames por segundo, isso conta? &#128516;'
+    ]
+  }
+};
+
+// Default responses when nothing matches
+const defaultResponses = [
+  'Hmm, essa e uma boa pergunta! Infelizmente ainda nao sei responder isso. Tente perguntar sobre programacao, tecnologia ou curiosidades!',
+  'Interessante! Ainda estou aprendendo sobre isso. Que tal perguntar algo sobre programacao ou IA?',
+  'Nao tenho certeza sobre isso, mas posso ajudar com programacao, tecnologia e curiosidades. O que acha?',
+  'Essa me pegou! Estou em constante aprendizado. Tente outra pergunta!'
+];
+
+// Find best response
+function getBotResponse(userMsg) {
+  const msg = userMsg.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, '');
+
+  let bestMatch = null;
+  let bestScore = 0;
+
+  for (const [category, data] of Object.entries(botKnowledge)) {
+    for (const pattern of data.patterns) {
+      const normalizedPattern = pattern.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (msg.includes(normalizedPattern)) {
+        const score = normalizedPattern.length;
+        if (score > bestScore) {
+          bestScore = score;
+          bestMatch = data.responses;
+        }
+      }
+    }
+  }
+
+  if (bestMatch) {
+    return bestMatch[Math.floor(Math.random() * bestMatch.length)];
+  }
+
+  return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+}
+
+// Get current time
+function getTime() {
+  return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+
+// Add message to chat
+function addMessage(text, sender) {
+  const messages = document.getElementById('chatMessages');
+  const msg = document.createElement('div');
+  msg.className = `message ${sender}`;
+  msg.innerHTML = `${text}<span class="msg-time">${getTime()}</span>`;
+  messages.appendChild(msg);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+// Show typing indicator
+function showTyping() {
+  document.getElementById('typing').classList.add('show');
+  const messages = document.getElementById('chatMessages');
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function hideTyping() {
+  document.getElementById('typing').classList.remove('show');
+}
+
+// Send message
+function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMessage(text, 'user');
+  input.value = '';
+
+  // Hide quick replies after first message
+  document.getElementById('quickReplies').style.display = 'none';
+
+  // Show typing then respond
+  showTyping();
+  const delay = Math.random() * 1000 + 800;
+
+  setTimeout(() => {
+    hideTyping();
+    const response = getBotResponse(text);
+    addMessage(response.replace(/\n/g, '<br>'), 'bot');
+  }, delay);
+}
+
+// Quick reply
+function sendQuick(text) {
+  document.getElementById('msgInput').value = text;
+  sendMessage();
+}
+
+// Welcome message
+window.onload = () => {
+  setTimeout(() => {
+    addMessage('Ola! Sou o <strong>Torres Bot IA</strong> &#129302;<br><br>Posso responder perguntas sobre programacao, tecnologia, curiosidades e mais!<br><br>Escolha uma opcao rapida abaixo ou escreva sua pergunta.', 'bot');
+  }, 500);
+};
+</script>
+</body>
+</html>
